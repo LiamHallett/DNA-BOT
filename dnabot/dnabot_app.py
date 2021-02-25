@@ -54,7 +54,7 @@ MAX_FINAL_ASSEMBLY_TIPRACKS = 7
 SPOTTING_VOLS_DICT = {2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5}
 
 # Constant lists
-SOURCE_DECK_POS = ['2', '5', '8', '7', '10', '11']
+SOURCE_DECK_POS = ['2', '5', '8', '7', '10', '11'] # I guess this adds the functionality of having more source plates?
 
 
 def __cli():
@@ -138,14 +138,13 @@ def main():
         else:
             output_dir = args.output_dir
         template_dir = args.template_dir
-        print("\n")
         print("\netoh_well ", etoh_well)
         print("\nsoc_column ", soc_column)
         print("\nconstruct_path ", construct_path)
         print("\nsources_paths ", sources_paths)
         print("\noutput_dir ", output_dir)
         print("\ntemplate_dir", template_dir)
-    else:
+    else:       # input args from gui
         user_inputs = __info_from_gui()
         etoh_well = user_inputs['etoh_well']
         soc_column = user_inputs['soc_column']
@@ -161,7 +160,7 @@ def main():
     # Path to template directory
     if template_dir is not None:
         # Just to comment this case: only way to fall here is that the variable has been set throught the command
-        # line arguments, nothing to do.^
+        # line arguments, nothing to do.
         template_dir_path = template_dir
         pass
     elif __name__ == '__main__':
@@ -180,7 +179,7 @@ def main():
 
     # Prefix name
     construct_base = os.path.basename(construct_path)
-    construct_base = os.path.splitext(construct_base)[0]
+    construct_base = os.path.splitext(construct_base)[0]    # 
     print('User input successfully collected.')
 
     # Process input csv files
@@ -280,20 +279,21 @@ def generate_constructs_list(path):
     constructs_list = []
     with open(path, 'r') as csvfile:
         csv_reader = csv.reader(csvfile)
-        for index, construct in enumerate(csv_reader):
-            if index != 0:  # Checks if row is header.
-                construct = list(filter(None, construct))
-                if not construct[1:]:
-                    break
-                else:
-                    constructs_list.append(process_construct(construct[1:]))
+        return csv_reader
+        # for index, construct in enumerate(csv_reader):
+        #     if index != 0:  # Checks if row is header.
+        #         construct = list(filter(None, construct))
+        #         if not construct[1:]:
+        #             break
+        #         else:
+        #             constructs_list.append(process_construct(construct[1:]))
 
-    # Errors
-    if len(constructs_list) > MAX_CONSTRUCTS:
-        raise ValueError(
-            'Number of constructs exceeds maximum. Reduce construct number in construct.csv.')
-    else:
-        return constructs_list
+    # # Errors
+    # if len(constructs_list) > MAX_CONSTRUCTS:
+    #     raise ValueError(
+    #         'Number of constructs exceeds maximum. Reduce construct number in construct.csv.')
+    # else:
+    #     return constructs_list
 
 
 # def generate_clips_df(constructs_list):
