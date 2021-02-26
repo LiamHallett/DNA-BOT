@@ -5,7 +5,7 @@ Created on Thu Apr 11 14:26:07 2019
 @author: mh2210
 """
 
-# python dnabot\dnabot_app.py --construct_path examples\construct_csvs\storch_et_al_cons\storch_et_al_cons.csv --source_paths examples\part_linker_csvs\BIOLEGIO_BASIC_STD_SET.csv examples\part_linker_csvs\part_plate_2_230419.csv
+# python dnabot\dnabot_app.py --construct_path \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\construct_csvs\storch_et_al_cons\storch_et_al_cons.csv --source_paths \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\part_linker_csvs\BIOLEGIO_BASIC_STD_SET.csv \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\part_linker_csvs\part_plate_2_230419.csv
 # python3 dnabot/dnabot_app.py --construct_path /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv --source_paths /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/part_linker_csvs/parts_linkers_temp.csv
 
 print("\nINITIALISING>>>")
@@ -180,14 +180,13 @@ def main():
 
     # Prefix name
     construct_base = os.path.basename(construct_path)
-    construct_base = os.path.splitext(construct_base)[0]    # 
+    construct_base = os.path.splitext(construct_base)[0]    # returns the constructs csv path without the file name
     print('User input successfully collected.')
 
     # Process input csv files
     print('Processing input csv files...')
-    constructs_list = generate_constructs_list(construct_path)
-    print(constructs_list)
-    # clips_df = generate_clips_df(constructs_list)
+    constructs_list = generate_constructs_list(construct_path) # returns a list of pandas dfs, each containing the clip reactions required for a given construct
+    clips_df = generate_clips_df(constructs_list)
     # sources_dict = generate_sources_dict(sources_paths)
 
 #     # calculate OT2 script variables
@@ -276,12 +275,12 @@ def generate_constructs_list(path):
                 else:
                     suffix_linker = interogate_linker(construct[i + 1])
                     clips_info['suffixes'].append(suffix_linker)    # add the suffix linker to the clips_info dict
-        return pd.DataFrame.from_dict(clips_info)
+        return pd.DataFrame.from_dict(clips_info)   # converts the dictionary of parts to a pd.DataFrame
 
     constructs_list = []
     with open(path, 'r') as csvfile: # opens path as csvfile
         csv_reader = csv.reader(csvfile) # reads csv file
-        for index, construct in enumerate(csv_reader):
+        for index, construct in enumerate(csv_reader): # for every construct (ie the row) in the csv file...
             if index != 0:  # Checks if row is header.
                 construct = list(filter(None, construct)) # removes empty values from csv
                 if not construct[1:]:
@@ -296,30 +295,30 @@ def generate_constructs_list(path):
     else:
         return constructs_list
 
+def generate_clips_df(constructs_list):
+    """Generates a dataframe containing information about all the unique CLIP 
+    reactions required to synthesise the constructs in constructs_list.
 
-# def generate_clips_df(constructs_list):
-#     """Generates a dataframe containing information about all the unique CLIP 
-#     reactions required to synthesise the constructs in constructs_list.
+    """
+    merged_construct_dfs = pd.concat(constructs_list, ignore_index=True) # converts list of dfs into one large df
+    unique_clips_df = merged_construct_dfs.drop_duplicates()    # drop duplicates
+    unique_clips_df = unique_clips_df.reset_index(drop=True)    # reset index
+    clips_df = unique_clips_df.copy() # makes a copy which is disconnected to the original
 
-#     """
-#     merged_construct_dfs = pd.concat(constructs_list, ignore_index=True)
-#     unique_clips_df = merged_construct_dfs.drop_duplicates()
-#     unique_clips_df = unique_clips_df.reset_index(drop=True)
-#     clips_df = unique_clips_df.copy()
+    # Error
+    if len(unique_clips_df.index) > MAX_CLIPS:
+        raise ValueError(
+            'Number of CLIP reactions exceeds 48. Reduce number of constructs in construct.csv.')
 
-#     # Error
-#     if len(unique_clips_df.index) > MAX_CLIPS:
-#         raise ValueError(
-#             'Number of CLIP reactions exceeds 48. Reduce number of constructs in construct.csv.')
-
-#     # Count number of each CLIP reaction
-#     clip_count = np.zeros(len(clips_df.index))
-#     for i, unique_clip in unique_clips_df.iterrows():
-#         for _, clip in merged_construct_dfs.iterrows():
-#             if unique_clip.equals(clip):
-#                 clip_count[i] = clip_count[i] + 1
-#     clip_count = clip_count // FINAL_ASSEMBLIES_PER_CLIP + 1
-#     clips_df['number'] = [int(i) for i in clip_count.tolist()]
+    # Count number of each CLIP reaction
+    clip_count = np.zeros(len(clips_df.index))
+    # for i, unique_clip in unique_clips_df.iterrows():
+    #     for _, clip in merged_construct_dfs.iterrows():
+    #         if unique_clip.equals(clip):
+    #             clip_count[i] = clip_count[i] + 1
+    # clip_count = clip_count // FINAL_ASSEMBLIES_PER_CLIP + 1
+    # clips_df['number'] = [int(i) for i in clip_count.tolist()]
+    print(clips_df)
 
 #     # Associate well/s for each CLIP reaction
 #     clips_df['mag_well'] = pd.Series(['0'] * len(clips_df.index),
