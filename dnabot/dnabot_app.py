@@ -6,6 +6,7 @@ Created on Thu Apr 11 14:26:07 2019
 """
 
 # python dnabot\dnabot_app.py --construct_path examples\construct_csvs\storch_et_al_cons\storch_et_al_cons.csv --source_paths examples\part_linker_csvs\BIOLEGIO_BASIC_STD_SET.csv examples\part_linker_csvs\part_plate_2_230419.csv
+# python3 dnabot/dnabot_app.py --construct_path /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv --source_paths /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/part_linker_csvs/parts_linkers_temp.csv
 
 print("\nINITIALISING>>>")
 
@@ -185,6 +186,7 @@ def main():
     # Process input csv files
     print('Processing input csv files...')
     constructs_list = generate_constructs_list(construct_path)
+    print(constructs_list)
     # clips_df = generate_clips_df(constructs_list)
     # sources_dict = generate_sources_dict(sources_paths)
 
@@ -245,55 +247,54 @@ def generate_constructs_list(path):
 
     """
 
-    # def process_construct(construct):
-    #     """Processes an individual construct into a dataframe of CLIP reactions
-    #     outlining prefix linkers, parts and suffix linkers.
+    def process_construct(construct):
+        """Processes an individual construct into a dataframe of CLIP reactions
+        outlining prefix linkers, parts and suffix linkers.
 
-    #     """
+        """
 
-    #     def interogate_linker(linker):
-    #         """Interrogates linker to determine if the suffix linker is a UTR
-    #         linker.
+        def interogate_linker(linker):
+            """Interrogates linker to determine if the suffix linker is a UTR
+            linker.
 
-    #         """
-    #         if linker.startswith('U'):
-    #             return linker.split('-')[0] + '-S'
-    #         else:
-    #             return linker + "-S"
+            """
+            if linker.startswith('U'):
+                return linker.split('-')[0] + '-S'
+            else:
+                return linker + "-S"
 
-    #     clips_info = {'prefixes': [], 'parts': [],
-    #                   'suffixes': []}
-    #     for i, sequence in enumerate(construct):
-    #         if i % 2 != 0:
-    #             clips_info['parts'].append(sequence)
-    #             clips_info['prefixes'].append(
-    #                 construct[i - 1] + '-P')
-    #             if i == len(construct) - 1:
-    #                 suffix_linker = interogate_linker(construct[0])
-    #                 clips_info['suffixes'].append(suffix_linker)
-    #             else:
-    #                 suffix_linker = interogate_linker(construct[i + 1])
-    #                 clips_info['suffixes'].append(suffix_linker)
-    #     return pd.DataFrame.from_dict(clips_info)
+        clips_info = {'prefixes': [], 'parts': [],
+                      'suffixes': []}
+        for i, sequence in enumerate(construct):
+            if i % 2 != 0: # for odd values (ie non-linkers)
+                clips_info['parts'].append(sequence)    # add name to clip_info dict parts array
+                clips_info['prefixes'].append(
+                    construct[i - 1] + '-P')            # add name of previous name to clip_info dict linker prefixes array
+                if i == len(construct) - 1:             # if the part is the final part in the construct...
+                    suffix_linker = interogate_linker(construct[0]) # ...find the suffix linker name from the first linker in the construct 
+                    clips_info['suffixes'].append(suffix_linker)    # add the suffix linker to the clips_info dict
+                else:
+                    suffix_linker = interogate_linker(construct[i + 1])
+                    clips_info['suffixes'].append(suffix_linker)    # add the suffix linker to the clips_info dict
+        return pd.DataFrame.from_dict(clips_info)
 
     constructs_list = []
-    with open(path, 'r') as csvfile:
-        csv_reader = csv.reader(csvfile)
-        return csv_reader
-        # for index, construct in enumerate(csv_reader):
-        #     if index != 0:  # Checks if row is header.
-        #         construct = list(filter(None, construct))
-        #         if not construct[1:]:
-        #             break
-        #         else:
-        #             constructs_list.append(process_construct(construct[1:]))
+    with open(path, 'r') as csvfile: # opens path as csvfile
+        csv_reader = csv.reader(csvfile) # reads csv file
+        for index, construct in enumerate(csv_reader):
+            if index != 0:  # Checks if row is header.
+                construct = list(filter(None, construct)) # removes empty values from csv
+                if not construct[1:]:
+                    break
+                else:
+                    constructs_list.append(process_construct(construct[1:]))    # assembles a dictionary of parts and linkers for the constructs csv
 
-    # # Errors
-    # if len(constructs_list) > MAX_CONSTRUCTS:
-    #     raise ValueError(
-    #         'Number of constructs exceeds maximum. Reduce construct number in construct.csv.')
-    # else:
-    #     return constructs_list
+    # Errors
+    if len(constructs_list) > MAX_CONSTRUCTS:
+        raise ValueError(
+            'Number of constructs exceeds maximum. Reduce construct number in construct.csv.')
+    else:
+        return constructs_list
 
 
 # def generate_clips_df(constructs_list):
