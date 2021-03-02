@@ -422,14 +422,16 @@ def generate_final_assembly_dict(constructs_list, clips_df):
 
     """
     final_assembly_dict = {}
-    clips_count = np.zeros(len(clips_df.index))
-#     for construct_index, construct_df in enumerate(constructs_list):
-#         construct_well_list = []
-#         for _, clip in construct_df.iterrows():
-#             clip_info = clips_df[(clips_df['prefixes'] == clip['prefixes']) &
-#                                  (clips_df['parts'] == clip['parts']) &
-#                                  (clips_df['suffixes'] == clip['suffixes'])]
-#             clip_wells = clip_info.at[clip_info.index[0], 'mag_well']
+    clips_count = np.zeros(len(clips_df.index))                                 # empty array of length unique clips
+    print(clips_df.index[1])
+    for construct_index, construct_df in enumerate(constructs_list):            # for every construct df in constructs list...
+        construct_well_list = []
+        for _, clip in construct_df.iterrows():                                 # ...for every clip...
+            clip_info = clips_df[(clips_df['prefixes'] == clip['prefixes']) &   # ...selects a specific clips based on its linkers and part
+                                 (clips_df['parts'] == clip['parts']) &
+                                 (clips_df['suffixes'] == clip['suffixes'])]
+            clip_wells = clip_info.at[clip_info.index[0], 'mag_well']
+            # print(clip_wells)
 #             clip_num = int(clip_info.index[0])
 #             clip_well = clip_wells[int(clips_count[clip_num] //
 #                                        FINAL_ASSEMBLIES_PER_CLIP)]
@@ -590,3 +592,5 @@ def handle_2_columns(datalist, return_list = False):
 
 if __name__ == '__main__':
     main()
+
+# 13 27 4 3 1 5 2 7 13 
