@@ -5,8 +5,8 @@ Created on Thu Apr 11 14:26:07 2019
 @author: mh2210
 """
 
-# python dnabot\dnabot_app.py --construct_path \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\construct_csvs\storch_et_al_cons\storch_et_al_cons.csv --source_paths \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\part_linker_csvs\BIOLEGIO_BASIC_STD_SET.csv \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\part_linker_csvs\part_plate_2_230419.csv
-# python3 dnabot/dnabot_app.py --construct_path /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv --source_paths /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/part_linker_csvs/part_plate_2_230419.csv
+# python dnabot\dnabot_app.py nogui --construct_path \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\construct_csvs\storch_et_al_cons\storch_et_al_cons.csv --source_paths \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\part_linker_csvs\BIOLEGIO_BASIC_STD_SET.csv \\icnas1.cc.ic.ac.uk\ljh119\GitHub\DNA-BOT\examples\part_linker_csvs\part_plate_2_230419.csv
+# python3 dnabot/dnabot_app.py nogui --construct_path /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv --source_paths /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv /Users/liamhallett/Documents/GitHub/DNA-BOT/examples/part_linker_csvs/part_plate_2_230419.csv
 
 print("\nINITIALISING>>>")
 
@@ -86,7 +86,7 @@ def __cli():
     # Makes life easier to decide if we should switch to GUI or not
     parser.set_defaults(nogui=False)
     parser_nogui.set_defaults(nogui=True)
-    return parser_nogui.parse_args()
+    return parser.parse_args()
 
 
 def __info_from_gui():
